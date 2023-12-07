@@ -19,7 +19,7 @@ const parameters = {
   rotation : 28,
   distance : 3,
   space : 0.05,
-  cubes_size : 1
+  cubes_size : 0.2
   
 }
 
@@ -52,16 +52,16 @@ var directionalLight;
   ///////////
   //GUI
     gui = new GUI;
-    gui.add(parameters, 'length', 1, 100 , 1);
+    gui.add(parameters, 'length', 1, 200 , 1);
     gui.add(parameters, 'rotation', 0, 50 , 0.1);
-    gui.add(parameters, 'distance', 0, 10 , 0.001);
+    gui.add(parameters, 'distance', 0, 5 , 0.001);
     gui.add(parameters, 'space', 0, 0.1 , 0.001);
-    gui.add(parameters, 'cubes_size', 0, 5 , 0.01);
+    gui.add(parameters, 'cubes_size', 0, 2 , 0.001);
 
   //CREATE SCENE AND CAMERA
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 10, width / height, 0.01, 5000);
-  camera.position.set(100, 100, 100)
+  camera = new THREE.PerspectiveCamera( 10, width / height, 0.01, 500);
+  camera.position.set(250, 250, 250)
 
   //LIGHTINGS
   ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -222,9 +222,17 @@ function create_cubes (){
     let vector_to_centroid = new THREE.Vector3(x_vec, y_vec, z_vec);
 
   
+    // setting this distance as the new edge and mulitplying with input parameter
+    let edge = vector_to_centroid.length() * _cubes_size;
+    
+    
+    // lower boundary for cubes size
+    if (edge < 0.2 ){
+      edge = 0.2;
+    }
 
     // create cubes geometry 
-    let cubes_geometry = new THREE.BoxGeometry(1,1,1);
+    let cubes_geometry = new THREE.BoxGeometry(edge,edge,edge);
     cubes_geometry.computeVertexNormals();
     
     // creating the cubes mesh and putting it in its place
