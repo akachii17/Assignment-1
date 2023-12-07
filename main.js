@@ -7,18 +7,9 @@ import GUI from 'lil-gui';
 
 //-------------------------------------------------------------------------------------
 
-
-
 //CONSTANT & VARIABLES
 let width = window.innerWidth;
 let height = window.innerHeight;
-
-
-
-
-
-
-
 
 //-- GUI PAREMETERS
 ////////////////////////
@@ -27,21 +18,13 @@ const parameters = {
   line_length: 20,
   a : 10,
   b : 28,
-  c : 2.667,
+  c : 2,
   dt : 0.01,
   sphere_size : 0.04
   
 }
 
-
-
-
-
-
-
-
 //-- SCENE VARIABLES
-
 var scene;
 var camera;
 var renderer;
@@ -50,18 +33,11 @@ var control;
 var ambientLight;
 var directionalLight;
 
-
-
-
-
-
 //-- GEOMETRY PARAMETERS
-
  let scene_lines = [];
  let line_points = [];
  let scene_spheres = [];
  let buffer_spheres = []
-
 
  let line_L = parameters.line_length;
  let _a = parameters.a;
@@ -72,26 +48,21 @@ var directionalLight;
 
  var line = new THREE.Line();
 
-
-
-
-
-
  function main(){
   ///////////
   //GUI
     gui = new GUI;
-    gui.add(parameters, 'line_length', 1, 2000 , 1);
+    gui.add(parameters, 'line_length', 1, 50 , 1);
     gui.add(parameters, 'a', 0, 20 , 0.1);
     gui.add(parameters, 'b', 0, 50 , 0.1);
-    gui.add(parameters, 'c', 0, 10 , 0.001);
+    gui.add(parameters, 'c', 0, 100 , 0.01);
     gui.add(parameters, 'dt', 0, 0.03 , 0.001);
     gui.add(parameters, 'sphere_size', 0, 0.1 , 0.001);
 
   //CREATE SCENE AND CAMERA
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 10, width / height, 0.01, 5000);
-  camera.position.set(100, 500, 500)
+  camera.position.set(100, 100, 100)
 
   //LIGHTINGS
   ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -115,7 +86,7 @@ var directionalLight;
   renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
   renderer.setSize( window.innerWidth, window.innerHeight );
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container = document.querySelector('#threejs-container');                             //????????????????
+  container = document.querySelector('#threejs-container');
   container.append(renderer.domElement);
   
   //CREATE MOUSE CONTROL
@@ -125,15 +96,6 @@ var directionalLight;
   animate();
 }
  
-
-
-
-
-
-
-
-
-
 
 //-----------------------------------------------------------------------------------
 //HELPER FUNCTIONS
@@ -225,20 +187,10 @@ function createLorenzAttractor ( start_x, start_y, start_z ) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
 function create_spheres (){
 
 // creating sphere color and material
-  let sphere_color = new THREE.Color("rgb(200,200,50)");
+  let sphere_color = new THREE.Color("rgb(500,100,100)");
   let sphere_material = new THREE.MeshStandardMaterial();
   sphere_material.color = sphere_color;
 
@@ -266,11 +218,6 @@ function create_spheres (){
   z_average = z_average / line_points.length;
 
   let average_point = new THREE.Vector3(x_average, y_average, z_average);
-
-  
-
-
-
   
   for (let element of line_points) {
     
@@ -284,27 +231,18 @@ function create_spheres (){
 
     let vector_to_centroid = new THREE.Vector3(x_vec, y_vec, z_vec);
 
-
-
-
     // setting this distance as the new radius and mulitplying with input parameter
     let radius = vector_to_centroid.length() * _sphere_size;
-    
     
     // lower boundary for sphere size
     if (radius < 0.2 ){
       radius = 0.2;
     }
 
-    
-
-
     // create sphere geometry 
     let sphere_geometry = new THREE.SphereGeometry( radius, 10, 6  ); 
     sphere_geometry.computeVertexNormals();
     
-
-
     // creating the sphere mesh and putting it in its place
     let sphere = new THREE.Mesh( sphere_geometry, sphere_material ); 
     sphere.position.set(element.x ,element.y ,element.z );
@@ -317,17 +255,9 @@ function create_spheres (){
 
     buffer_spheres.push(sphere_geometry);
 
-    
-
   }
 
 }
-
-
-
-
-
-
 
 function remove_line (){
 
@@ -346,14 +276,7 @@ function remove_line (){
   // create console output to reassure the method has been called
   console.log("line removed");
 
-
-
-
 }
-
-
-
-
 
 function remove_spheres (){
 
@@ -369,28 +292,14 @@ function remove_spheres (){
   // create console output to reassure the method has been called
   console.log("sphere removed");
 
-
-
-
-
 }
-
-
-
-
-
-
-
-
 
 //  REMOVE OBJECTS AND CLEAN THE CACHES
 function removeObject(sceneObject){
   if (!(sceneObject instanceof THREE.Object3D)) return;
 
-
   //Remove geometries to free GPU resources
   if (sceneObject.geometry) sceneObject.geometry.dispose();
-
 
   //Remove materials to free GPU resources
   if (sceneObject.material) {
@@ -401,21 +310,9 @@ function removeObject(sceneObject){
       }
   }
 
-
   //Remove object from scene
   sceneObject.removeFromParent()
 };
-
-
-
-
-
-
-
-
-
-
-
 
 //RESPONSIVE
 function handleResize() {
@@ -427,30 +324,13 @@ function handleResize() {
   renderer.render(scene, camera);
 }
 
-
-
-
-
-
-
-
-
-
 //ANIMATE AND RENDER
 function animate() {
   requestAnimationFrame( animate );
 
-
-
-
   control.update();
 
-  
-
-
   if (line_L != parameters.line_length || _a != parameters.a || _b != parameters.b || _c != parameters.c || _dt != parameters.dt || _sphere_size != parameters.sphere_size){
-
-
 
     // resetting the parameters
     line_L = parameters.line_length;
@@ -460,7 +340,6 @@ function animate() {
     _dt = parameters.dt;
     _sphere_size = parameters.sphere_size;
 
-
     remove_line();
     remove_spheres();
     createLorenzAttractor(1,1,1);
@@ -469,18 +348,8 @@ function animate() {
 
   }
 
-
-
- 
   renderer.render( scene, camera );
 }
-
-
-
-
-
-
-
 
 //-----------------------------------------------------------------------------------
 // EXECUTE MAIN 
