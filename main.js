@@ -17,7 +17,7 @@ var gui;
 const parameters = {
   length: 20,
   rotation : 28,
-  distance : 2.667,
+  distance : 3,
   space : 0.05,
   cubes_size : 1
   
