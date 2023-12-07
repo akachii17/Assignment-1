@@ -33,6 +33,8 @@ var control;
 var ambientLight;
 var directionalLight;
 
+
+
 //-- GEOMETRY PARAMETERS
  let scene_lines = [];
  let line_points = [];
@@ -73,6 +75,8 @@ var directionalLight;
   directionalLight.target.position.set(-1,-1,0);
   scene.add( directionalLight );
   scene.add(directionalLight.target);
+
+  scene.background = new THREE.Color(0xbfe3dd);
 
   //GEOMETRY INITIATION
   createLorenzAttractor(1,1,1);
