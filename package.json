@@ -1,0 +1,21 @@
+{
+  "name": "jonathan_schill_1",
+  "homepage": "https://creativecomputingicd.github.io/jonathan_schill_1/",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^4.4.5"
+  },
+  "dependencies": {
+    "lil-gui": "^0.19.1",
+    "three": "^0.158.0"
+  }
+}
