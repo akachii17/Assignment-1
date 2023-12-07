@@ -15,12 +15,11 @@ let height = window.innerHeight;
 ////////////////////////
 var gui;
 const parameters = {
-  line_length: 20,
-  a : 10,
-  b : 28,
-  c : 2,
-  dt : 0.01,
-  sphere_size : 0.04
+  length: 20,
+  rotation : 28,
+  distance : 2.667,
+  space : 0.05,
+  cubes_size : 1
   
 }
 
@@ -38,15 +37,14 @@ var directionalLight;
 //-- GEOMETRY PARAMETERS
  let scene_lines = [];
  let line_points = [];
- let scene_spheres = [];
- let buffer_spheres = []
+ let scene_cubes = [];
+ let buffer_cubes = []
 
- let line_L = parameters.line_length;
- let _a = parameters.a;
- let _b = parameters.b;
- let _c = parameters.c;
- let _dt = parameters.dt;
- let _sphere_size = parameters.sphere_size;
+ let line_L = parameters.length;
+ let _rotation = parameters.rotation;
+ let _distance = parameters.distance;
+ let _space = parameters.space;
+ let _cubes_size = parameters.cubes_size;
 
  var line = new THREE.Line();
 
@@ -54,12 +52,11 @@ var directionalLight;
   ///////////
   //GUI
     gui = new GUI;
-    gui.add(parameters, 'line_length', 1, 50 , 1);
-    gui.add(parameters, 'a', 0, 20 , 0.1);
-    gui.add(parameters, 'b', 0, 50 , 0.1);
-    gui.add(parameters, 'c', 0, 100 , 0.01);
-    gui.add(parameters, 'dt', 0, 0.03 , 0.001);
-    gui.add(parameters, 'sphere_size', 0, 0.1 , 0.001);
+    gui.add(parameters, 'length', 1, 100 , 1);
+    gui.add(parameters, 'rotation', 0, 50 , 0.1);
+    gui.add(parameters, 'distance', 0, 10 , 0.001);
+    gui.add(parameters, 'space', 0, 0.1 , 0.001);
+    gui.add(parameters, 'cubes_size', 0, 5 , 0.01);
 
   //CREATE SCENE AND CAMERA
   scene = new THREE.Scene();
@@ -80,7 +77,7 @@ var directionalLight;
 
   //GEOMETRY INITIATION
   createLorenzAttractor(1,1,1);
-  create_spheres();
+  create_cubes();
 
 
   //RESPONSIVE WINDOW
@@ -113,17 +110,6 @@ function createLorenzAttractor ( start_x, start_y, start_z ) {
   let old_y = start_y;
   let old_z = start_z;
 
-
-  /*
-  // konstanten 
-  let _a = 10;
-  let _b = 28;
-  let _c = 2.667;
-  let _dt = 0.01;
-  */
-
-
-
   // var line_points = [];
   line_points = [];
 
@@ -131,9 +117,9 @@ function createLorenzAttractor ( start_x, start_y, start_z ) {
   for (let v = 0 ; v < line_L ; v++ ){
 
 
-    let new_x = old_x + _a * (old_y - old_x) * _dt;
-    let new_y = old_y + (old_x * ( _b - old_z ) - old_y ) * _dt;
-    let new_z = old_z + ( old_x * old_y - _c * old_z ) * _dt;
+    let new_x = old_x + _cubes_size * (old_y - old_x) * _space;
+    let new_y = old_y + (old_x * ( _rotation - old_z ) - old_y ) * _space;
+    let new_z = old_z + ( old_x * old_y - _distance * old_z ) * _space;
 
 
     line_points.push( new THREE.Vector3(new_x, new_y, new_z));
@@ -186,22 +172,22 @@ function createLorenzAttractor ( start_x, start_y, start_z ) {
   scene_lines.push(line);
 
 
-  line_L = parameters.line_length;
+  line_L = parameters.length;
 
 
 }
 
-function create_spheres (){
+function create_cubes (){
 
 // creating sphere color and material
-  let sphere_color = new THREE.Color("rgb(500,100,100)");
-  let sphere_material = new THREE.MeshStandardMaterial();
-  sphere_material.color = sphere_color;
+  let cubes_color = new THREE.Color("rgb(500,100,100)");
+  let cubes_material = new THREE.MeshStandardMaterial();
+  cubes_material.color = cubes_color;
 
 
   // emptying the lists
-  scene_spheres = [];
-  buffer_spheres = []
+  scene_cubes = [];
+  buffer_cubes = []
 
 
   // calculating the center point of geometry
@@ -235,29 +221,23 @@ function create_spheres (){
 
     let vector_to_centroid = new THREE.Vector3(x_vec, y_vec, z_vec);
 
-    // setting this distance as the new radius and mulitplying with input parameter
-    let radius = vector_to_centroid.length() * _sphere_size;
+  
+
+    // create cubes geometry 
+    let cubes_geometry = new THREE.BoxGeometry(1,1,1);
+    cubes_geometry.computeVertexNormals();
     
-    // lower boundary for sphere size
-    if (radius < 0.2 ){
-      radius = 0.2;
-    }
+    // creating the cubes mesh and putting it in its place
+    let cubes = new THREE.Mesh( cubes_geometry, cubes_material ); 
+    cubes.position.set(element.x ,element.y ,element.z );
+    cubes.name = "cubes";
 
-    // create sphere geometry 
-    let sphere_geometry = new THREE.SphereGeometry( radius, 10, 6  ); 
-    sphere_geometry.computeVertexNormals();
-    
-    // creating the sphere mesh and putting it in its place
-    let sphere = new THREE.Mesh( sphere_geometry, sphere_material ); 
-    sphere.position.set(element.x ,element.y ,element.z );
-    sphere.name = "sphere";
+    // adding the cubes to the scene and appending it to the lists
+    scene.add( cubes );
+    console.log("cubes created!");
+    scene_cubes.push(cubes);
 
-    // adding the sphere to the scene and appending it to the lists
-    scene.add( sphere );
-    console.log("sphere created!");
-    scene_spheres.push(sphere);
-
-    buffer_spheres.push(sphere_geometry);
+    buffer_cubes.push(cubes_geometry);
 
   }
 
@@ -266,7 +246,7 @@ function create_spheres (){
 function remove_line (){
 
   //resetting the line length parameter
-  line_L = parameters.line_length;
+  line_L = parameters.length;
 
   // removing line
   scene_lines.forEach(element =>{
@@ -282,19 +262,19 @@ function remove_line (){
 
 }
 
-function remove_spheres (){
+function remove_cubes (){
 
   // removing line
-  scene_spheres.forEach(element =>{
-    var scene_sphere = scene.getObjectByName(element.name);
-    removeObject(scene_sphere);
+  scene_cubes.forEach(element =>{
+    var scene_cubes = scene.getObjectByName(element.name);
+    removeObject(scene_cubes);
   })
 
   // reinitializing the array that holds the line
-  scene_spheres = [];
+  scene_cubes = [];
 
   // create console output to reassure the method has been called
-  console.log("sphere removed");
+  console.log("cubes removed");
 
 }
 
@@ -334,20 +314,19 @@ function animate() {
 
   control.update();
 
-  if (line_L != parameters.line_length || _a != parameters.a || _b != parameters.b || _c != parameters.c || _dt != parameters.dt || _sphere_size != parameters.sphere_size){
+  if (line_L != parameters.length || _rotation != parameters.rotation ||  _distance != parameters.distance ||  _space != parameters.space ||_cubes_size != parameters.cubes_size){
 
     // resetting the parameters
-    line_L = parameters.line_length;
-    _a = parameters.a;
-    _b = parameters.b;
-    _c = parameters.c;
-    _dt = parameters.dt;
-    _sphere_size = parameters.sphere_size;
+    line_L = parameters.length;
+    _rotation = parameters.rotation;
+    _distance = parameters.distance;
+    _space = parameters.space;
+    _cubes_size = parameters.cubes_size;
 
     remove_line();
-    remove_spheres();
+    remove_cubes();
     createLorenzAttractor(1,1,1);
-    create_spheres();
+    create_cubes();
     //console.log("YES")
 
   }
@@ -362,3 +341,4 @@ function animate() {
 main();
 
 
+Sphere
